@@ -17,19 +17,19 @@ var numberOfRetrievedFiles = 0
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Println("Usage : ", os.Args[0],
-			" aws_profile_name s3bucket destDirPath")
+			" s3bucket destDirPath")
 		os.Exit(1)
 	}
-	fmt.Println("Getting all files from the s3 bucket :", os.Args[2])
-	fmt.Println("And will download them to :", os.Args[3])
-	sess := makeSession(os.Args[1])
+	fmt.Println("Getting all files from the s3 bucket :", os.Args[1])
+	fmt.Println("And will download them to :", os.Args[2])
+	sess := makeSession()
 	getBucketObjects(sess)
 	// Print number of retrieved files
 	fmt.Printf("We got %d files from our s3 bucket\n",
 		numberOfRetrievedFiles)
 }
 
-func makeSession(profile string) *session.Session {
+func makeSession() *session.Session {
 	// Specify profile to load for the session's config
 	sess, err := session.NewSession(&aws.Config{
 		Region: aws.String("eu-west-1"),
