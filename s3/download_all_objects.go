@@ -15,7 +15,7 @@ import (
 var numberOfRetrievedFiles = 0
 
 func main() {
-	if len(os.Args) != 4 {
+	if len(os.Args) != 3 {
 		fmt.Println("Usage : ", os.Args[0],
 			" aws_profile_name s3bucket destDirPath")
 		os.Exit(1)
@@ -30,12 +30,9 @@ func main() {
 }
 
 func makeSession(profile string) *session.Session {
-	// Enable loading shared config file
-	os.Setenv("AWS_SDK_LOAD_CONFIG", "1")
 	// Specify profile to load for the session's config
-	sess, err := session.NewSessionWithOptions(session.Options{
-		Config:  aws.Config{Region: aws.String("eu-west-1")},
-		Profile: profile,
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("eu-west-1"),
 	})
 	if err != nil {
 		fmt.Println("failed to create session,", err)
