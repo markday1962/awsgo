@@ -17,10 +17,14 @@ func main() {
 	ec2Svc := ec2.New(sess)
 
 	// Call to get detailed information on each instance
+	// result is *ec2.DescribeInstancesOutput
 	result, err := ec2Svc.DescribeInstances(nil)
 	if err != nil {
 		fmt.Println("Error", err)
 	} else {
-		fmt.Println("Success", result)
+		fmt.Println("Success")
+		fmt.Printf("return s a pointer to %T\n", result)
+		fmt.Println(result)
 	}
+
 }
