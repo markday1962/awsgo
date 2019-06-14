@@ -2,9 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
+
+type Instance struct {
+	Code int32
+	Name string
+}
 
 func main() {
 
@@ -14,17 +20,33 @@ func main() {
 	}))
 
 	// Create new EC2 client
+	//in := "i-032b17747be967271"
+	var il = []*string{aws.String("i-xxxxxx"), aws.String("i-xxxxx")}
 	ec2Svc := ec2.New(sess)
 
 	// Call to get detailed information on each instance
 	// result is *ec2.DescribeInstancesOutput
-	result, err := ec2Svc.DescribeInstances(nil)
+	//input := &ec2.DescribeInstancesInput{
+	//	InstanceIds: []*string{
+	//		aws.String(in),
+	//	},
+	//}
+	input := &ec2.DescribeInstancesInput{
+		InstanceIds: il,
+	}
+	result, err := ec2Svc.DescribeInstances(input)
+
 	if err != nil {
 		fmt.Println("Error", err)
-	} else {
-		fmt.Println("Success")
-		fmt.Printf("return s a pointer to %T\n", result)
-		fmt.Println(result)
 	}
 
+	for idx, _ := range result.Reservations {
+		for _, inst := range result.Reservations[idx].Instances {
+			if *inst.State.Code == 16 {
+				fmt.Printf("The instance %v is running %v\n", *inst.InstanceId, *inst.State.Code)
+			} else {
+				fmt.Printf("The instance %v is not running, current state is %v\n", *inst.InstanceId, *inst.State.Name)
+			}
+		}
+	}
 }
