@@ -87,11 +87,7 @@ func ReadFiles() []string {
 	}
 
 	for _, file := range files {
-		fmt.Println(file.Name())
 		fl = append(fl,file.Name() )
-	}
-	for _, v := range(fl){
-		fmt.Print(v)
 	}
 
 	return fl
