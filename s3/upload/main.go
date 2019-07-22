@@ -24,6 +24,7 @@ func main() {
 	// Create a single AWS session (we can re use this if we're uploading many files)
 	s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
 	if err != nil {
+		log.Printf("Error creating session: %v", err)
 		log.Fatal(err)
 	}
 
@@ -43,12 +44,18 @@ func main() {
 // AddFileToS3 will upload a single file to S3, it will require a pre-built aws session
 // and will set file info like content type and encryption on the uploaded file.
 func AddFileToS3(s *session.Session, files []string) error {
+	key, err := os.Hostname()
+	if err != nil{
+		log.Printf("Error retrieving hostname: %v", err)
+		return err
+	}
 
 	os.Chdir(ROOT_DIR)
 	for _, afile := range files {
 		// Open the file for use
 		file, err := os.Open(afile)
 		if err != nil {
+			log.Printf("Error opening %v: %v", afile, err)
 			return err
 		}
 		defer file.Close()
@@ -61,11 +68,10 @@ func AddFileToS3(s *session.Session, files []string) error {
 
 		// Config settings: this is where you choose the bucket, filename, content-type etc.
 		// of the file you're uploading.
-
-		fmt.Printf("Uploading %s\n", afile)
+		log.Printf("Uploading %s\n",key + "/" + afile)
 		_, err = s3.New(s).PutObject(&s3.PutObjectInput{
 			Bucket:               aws.String(S3_BUCKET),
-			Key:                  aws.String(afile),
+			Key:                  aws.String(key + "/" + afile),
 			ACL:                  aws.String("private"),
 			Body:                 bytes.NewReader(buffer),
 			ContentLength:        aws.Int64(size),
@@ -83,13 +89,12 @@ func ReadFiles() []string {
 
 	files, err := ioutil.ReadDir(ROOT_DIR)
 	if err != nil {
+		log.Printf("Error reading %v: %v",ROOT_DIR, err)
 		log.Fatal(err)
 	}
-
 	for _, file := range files {
 		fl = append(fl,file.Name() )
 	}
-
 	return fl
 }
 
